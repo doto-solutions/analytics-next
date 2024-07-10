@@ -1,7 +1,7 @@
 import { Analytics, segmentio } from '@segment/analytics-next'
 import { logger } from '../../lib/logger'
 import { Signal } from '../../types'
-import { redactJsonValues, redactSignalData } from './redact'
+import { redactSignalData } from './redact'
 
 export class SignalsIngestSettings {
   flushAt: number

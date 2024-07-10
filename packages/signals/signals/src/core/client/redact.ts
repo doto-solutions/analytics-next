@@ -6,9 +6,9 @@ export const redactSignalData = (signal: Signal): Signal => {
   }
   if (signal.type === 'interaction') {
     if ('target' in signal.data && 'value' in signal.data.target) {
-      signal.data.target.value = redact(signal.data.target.value)
+      signal.data.target.value = redactPrimitive(signal.data.target.value)
     } else if ('submitter' in signal.data && 'value' in signal.data.submitter) {
-      signal.data.submitter.value = redact(signal.data.submitter.value)
+      signal.data.submitter.value = redactPrimitive(signal.data.submitter.value)
     }
     return signal
   }
@@ -19,7 +19,7 @@ export const redactSignalData = (signal: Signal): Signal => {
   return signal
 }
 
-function redact(value: unknown) {
+function redactPrimitive(value: unknown) {
   const type = typeof value
   if (type === 'boolean') {
     return true
@@ -52,7 +52,7 @@ export function redactJsonValues(data: unknown, redactAfterDepth = 0): any {
       return redactedData
     }
   } else if (redactAfterDepth <= 0) {
-    const ret = redact(data)
+    const ret = redactPrimitive(data)
     return ret
   } else {
     return data
