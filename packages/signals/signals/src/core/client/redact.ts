@@ -6,9 +6,7 @@ export const redactSignalData = (signal: Signal): Signal => {
   }
   if (signal.type === 'interaction') {
     if ('target' in signal.data && 'value' in signal.data.target) {
-      signal.data.target.value = redactPrimitive(signal.data.target.value)
-    } else if ('submitter' in signal.data && 'value' in signal.data.submitter) {
-      signal.data.submitter.value = redactPrimitive(signal.data.submitter.value)
+      signal.data.target.value = redactJsonValues(signal.data.target.value)
     }
     return signal
   }

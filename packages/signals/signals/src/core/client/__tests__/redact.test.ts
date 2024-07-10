@@ -85,18 +85,6 @@ describe(redactSignalData, () => {
     expect(redactSignalData(signal)).toEqual(expected)
   })
 
-  it('should redact the value in the "submitter" property if the type is "interaction"', () => {
-    const signal = createInteractionSignal({
-      eventType: 'submit',
-      submitter: { value: 'secret' },
-    })
-    const expected = createInteractionSignal({
-      eventType: 'submit',
-      submitter: { value: 'XXX' },
-    })
-    expect(redactSignalData(signal)).toEqual(expected)
-  })
-
   it('should redact the values in the "data" property if the type is "network"', () => {
     const signal = createNetworkSignal({
       action: 'Request',
