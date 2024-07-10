@@ -2,9 +2,7 @@ import { Signal } from '../../types'
 
 export const redactSignalData = (signalArg: Signal): Signal => {
   const signal = structuredClone(signalArg)
-  if (signal.type === 'instrumentation' || signal.type === 'userDefined') {
-    return signal
-  } else if (signal.type === 'interaction') {
+  if (signal.type === 'interaction') {
     if ('target' in signal.data && 'value' in signal.data.target) {
       signal.data.target.value = redactJsonValues(signal.data.target.value)
     }
@@ -13,6 +11,7 @@ export const redactSignalData = (signalArg: Signal): Signal => {
     signal.data = redactJsonValues(signal.data, 2)
     return signal
   }
+
   return signal
 }
 
