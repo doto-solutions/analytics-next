@@ -102,11 +102,11 @@ describe(redactSignalData, () => {
       action: 'Request',
       method: 'post',
       url: 'http://foo.com',
-      data: { name: 'John Doe', age: '30' },
+      data: { name: 'John Doe', age: 30 },
     })
     const expected = createNetworkSignal({
       ...signal.data,
-      data: { name: 'XXX', age: 'XXX' },
+      data: { name: 'XXX', age: 999 },
     })
     expect(redactSignalData(signal)).toEqual(expected)
   })
