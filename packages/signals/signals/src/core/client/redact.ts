@@ -6,12 +6,9 @@ export const redactSignalData = (signalArg: Signal): Signal => {
     if ('target' in signal.data && 'value' in signal.data.target) {
       signal.data.target.value = redactJsonValues(signal.data.target.value)
     }
-    return signal
   } else if (signal.type === 'network') {
     signal.data = redactJsonValues(signal.data, 2)
-    return signal
   }
-
   return signal
 }
 
