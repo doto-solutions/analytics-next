@@ -3,16 +3,14 @@ import { Signal } from '../../types'
 export const redactSignalData = (signal: Signal): Signal => {
   if (signal.type === 'instrumentation' || signal.type === 'userDefined') {
     return signal
-  }
-  if (signal.type === 'interaction') {
+  } else if (signal.type === 'interaction') {
     if ('target' in signal.data && 'value' in signal.data.target) {
       signal.data.target.value = redactJsonValues(signal.data.target.value)
     }
     return signal
-  }
-
-  if (signal.type === 'network') {
+  } else if (signal.type === 'network') {
     signal.data = redactJsonValues(signal.data, 2)
+    return signal
   }
   return signal
 }
