@@ -1,4 +1,9 @@
-import { redactJsonValues } from '../redact'
+import {
+  createInstrumentationSignal,
+  createInteractionSignal,
+  createNetworkSignal,
+} from '../../../types'
+import { redactJsonValues, redactSignalData } from '../redact'
 
 describe('redactJsonValues', () => {
   it('should redact string values in an object', () => {
@@ -52,5 +57,56 @@ describe('redactJsonValues', () => {
       l2: { b: 'B', l3: { c: 'XXX', l4: { d: 'XXX' } } },
     }
     expect(redactJsonValues(obj, 3)).toEqual(expected)
+  })
+})
+describe.only('redactSignalData', () => {
+  it('should return the signal as is if the type is "instrumentation"', () => {
+    const signal = createInstrumentationSignal({
+      foo: 123,
+    } as any)
+    expect(redactSignalData(signal)).toEqual(signal)
+  })
+
+  it('should return the signal as is if the type is "userDefined"', () => {
+    const signal = { type: 'userDefined', data: { value: 'secret' } } as const
+    expect(redactSignalData(signal)).toEqual(signal)
+  })
+
+  it('should redact the value in the "target" property if the type is "interaction"', () => {
+    const signal = createInteractionSignal({
+      eventType: 'change',
+      target: { value: 'secret' },
+    })
+    const expected = createInteractionSignal({
+      eventType: 'change',
+      target: { value: 'XXX' },
+    })
+    expect(redactSignalData(signal)).toEqual(expected)
+  })
+
+  it('should redact the value in the "submitter" property if the type is "interaction"', () => {
+    const signal = createInteractionSignal({
+      eventType: 'submit',
+      submitter: { value: 'secret' },
+    })
+    const expected = createInteractionSignal({
+      eventType: 'submit',
+      submitter: { value: 'XXX' },
+    })
+    expect(redactSignalData(signal)).toEqual(expected)
+  })
+
+  it('should redact the values in the "data" property if the type is "network"', () => {
+    const signal = createNetworkSignal({
+      action: 'Request',
+      method: 'post',
+      url: 'http://foo.com',
+      data: { name: 'John Doe', age: '30' },
+    })
+    const expected = createNetworkSignal({
+      ...signal.data,
+      data: { name: 'XXX', age: 'XXX' },
+    })
+    expect(redactSignalData(signal)).toEqual(expected)
   })
 })

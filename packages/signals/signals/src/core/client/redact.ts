@@ -1,3 +1,24 @@
+import { Signal } from '../../types'
+
+export const redactSignalData = (signal: Signal): Signal => {
+  if (signal.type === 'instrumentation' || signal.type === 'userDefined') {
+    return signal
+  }
+  if (signal.type === 'interaction') {
+    if ('target' in signal.data && 'value' in signal.data.target) {
+      signal.data.target.value = redact(signal.data.target.value)
+    } else if ('submitter' in signal.data && 'value' in signal.data.submitter) {
+      signal.data.submitter.value = redact(signal.data.submitter.value)
+    }
+    return signal
+  }
+
+  if (signal.type === 'network') {
+    signal.data = redactJsonValues(signal.data, 2)
+  }
+  return signal
+}
+
 function redact(value: unknown) {
   const type = typeof value
   if (type === 'boolean') {
