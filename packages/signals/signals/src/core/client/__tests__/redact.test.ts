@@ -93,7 +93,9 @@ describe(redactSignalData, () => {
       data: { name: 'John Doe', age: 30 },
     })
     const expected = createNetworkSignal({
-      ...signal.data,
+      action: 'Request',
+      method: 'post',
+      url: 'http://foo.com',
       data: { name: 'XXX', age: 999 },
     })
     expect(redactSignalData(signal)).toEqual(expected)
