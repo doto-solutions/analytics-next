@@ -5,7 +5,7 @@ import {
 } from '../../../types'
 import { redactJsonValues, redactSignalData } from '../redact'
 
-describe('redactJsonValues', () => {
+describe(redactJsonValues, () => {
   it('should redact string values in an object', () => {
     const obj = { name: 'John Doe', age: '30' }
     const expected = { name: 'XXX', age: 'XXX' }
@@ -59,7 +59,8 @@ describe('redactJsonValues', () => {
     expect(redactJsonValues(obj, 3)).toEqual(expected)
   })
 })
-describe.only('redactSignalData', () => {
+
+describe(redactSignalData, () => {
   it('should return the signal as is if the type is "instrumentation"', () => {
     const signal = createInstrumentationSignal({
       foo: 123,
