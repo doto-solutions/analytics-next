@@ -1,6 +1,7 @@
 import { Signal } from '../../types'
 
-export const redactSignalData = (signal: Signal): Signal => {
+export const redactSignalData = (signalArg: Signal): Signal => {
+  const signal = structuredClone(signalArg)
   if (signal.type === 'instrumentation' || signal.type === 'userDefined') {
     return signal
   } else if (signal.type === 'interaction') {

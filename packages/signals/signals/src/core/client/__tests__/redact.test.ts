@@ -100,4 +100,15 @@ describe(redactSignalData, () => {
     })
     expect(redactSignalData(signal)).toEqual(expected)
   })
+
+  it('should not mutate the original signal object', () => {
+    const originalSignal = createInteractionSignal({
+      eventType: 'click',
+      target: { value: 'sensitiveData' },
+    })
+    const originalSignalCopy = JSON.parse(JSON.stringify(originalSignal))
+
+    redactSignalData(originalSignal)
+    expect(originalSignal).toEqual(originalSignalCopy)
+  })
 })
