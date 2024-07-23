@@ -119,13 +119,17 @@ describe('Lazy destination loading', () => {
 
     analytics.register(testEnrichmentPlugin).catch(() => {})
 
-    await analytics.load({
+    // we won't hold enrichment plugin from loading since they are not lazy loaded
+
+    const analyticsP = analytics.load({
       writeKey: 'abc',
       plugins: [dest1Harness.factory, dest2Harness.factory],
     })
 
-    // we won't hold enrichment plugin from loading since they are not lazy loaded
     testEnrichmentHarness.loadingGuard.resolve()
+
+    await analyticsP
+
     // and we'll also let one destination load so we can assert some behaviours
     dest1Harness.loadingGuard.resolve()
 
