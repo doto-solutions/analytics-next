@@ -218,7 +218,8 @@ async function registerPlugins(
   analytics: Analytics,
   options: InitOptions,
   pluginLikes: (Plugin | PluginFactory)[] = [],
-  legacyIntegrationSources: ClassicIntegrationSource[]
+  legacyIntegrationSources: ClassicIntegrationSource[],
+  preInitBuffer: PreInitMethodCallBuffer
 ): Promise<Context> {
   const plugins = pluginLikes?.filter(
     (pluginLike) => typeof pluginLike === 'object'
@@ -305,8 +306,11 @@ async function registerPlugins(
       )
     )
   }
+  const bufferedPlugins = preInitBuffer
+    .dequeue('register')
+    .reduce<Plugin[]>((acc, val) => acc.concat(val.args as Plugin[]), [])
 
-  const ctx = await analytics.register(...toRegister)
+  const ctx = await analytics.register(...toRegister, ...bufferedPlugins)
 
   if (
     Object.entries(cdnSettings.enabledMiddleware ?? {}).some(
@@ -402,7 +406,8 @@ async function loadAnalytics(
     analytics,
     options,
     plugins,
-    classicIntegrations
+    classicIntegrations,
+    preInitBuffer
   )
 
   const search = window.location.search ?? ''

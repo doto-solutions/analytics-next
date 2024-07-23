@@ -178,6 +178,12 @@ export class PreInitMethodCallBuffer {
     return (this.calls[methodName] ?? []) as PreInitMethodCall<T>[]
   }
 
+  dequeue<T extends PreInitMethodName>(methodName: T): PreInitMethodCall<T>[] {
+    const calls = this.getCalls(methodName)
+    this.calls[methodName] = []
+    return calls
+  }
+
   push(...calls: PreInitMethodCall[]): void {
     calls.forEach((call) => {
       const eventsExpectingPageContext: PreInitMethodName[] = [
