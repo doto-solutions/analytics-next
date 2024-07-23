@@ -306,11 +306,15 @@ async function registerPlugins(
       )
     )
   }
-  const bufferedPlugins = preInitBuffer
-    .dequeue('register')
-    .reduce<Plugin[]>((acc, val) => acc.concat(val.args as Plugin[]), [])
 
-  const ctx = await analytics.register(...toRegister, ...bufferedPlugins)
+  const bufferedRegisterCalls = preInitBuffer.dequeue('register')
+  for (const b of bufferedRegisterCalls) {
+    await analytics
+      .register(...(b.args as Plugin[]))
+      .then((ctx) => b.resolve(ctx as any))
+      .catch((err) => b.reject(err))
+  }
+  const ctx = await analytics.register(...toRegister)
 
   if (
     Object.entries(cdnSettings.enabledMiddleware ?? {}).some(
