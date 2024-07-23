@@ -311,7 +311,7 @@ async function registerPlugins(
   for (const b of bufferedRegisterCalls) {
     await analytics
       .register(...(b.args as Plugin[]))
-      .then((ctx) => b.resolve(ctx as any))
+      .then((ctx) => b.resolve(Promise.resolve(ctx)))
       .catch((err) => b.reject(err))
   }
   const ctx = await analytics.register(...toRegister)
