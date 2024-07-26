@@ -11,6 +11,7 @@ import {
   createPageContext,
   PageContext,
 } from '../page'
+import { type } from 'os'
 
 /**
  * The names of any AnalyticsBrowser methods that also exist on Analytics
@@ -93,8 +94,8 @@ export const flushAnalyticsCallsInNewTask = (
   analytics: Analytics,
   buffer: PreInitMethodCallBuffer
 ): void => {
-  buffer.toArray().forEach((m) => {
-    buffer.dequeue(m.method).forEach((c) => {
+  ;(Object.keys(buffer.calls) as (keyof typeof buffer.calls)[]).forEach((m) => {
+    buffer.dequeue(m).forEach((c) => {
       setTimeout(() => {
         callAnalyticsMethod(analytics, c).catch(console.error)
       }, 0)
@@ -179,7 +180,7 @@ export class PreInitMethodCallBuffer {
   /**
    * Pull any buffered method calls from the window object, and use them to hydrate the instance buffer.
    */
-  private get calls() {
+  public get calls() {
     this._pushSnippetWindowBuffer()
     return this._callMap
   }
