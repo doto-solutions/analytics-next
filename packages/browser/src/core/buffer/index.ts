@@ -54,7 +54,7 @@ const flushSyncAnalyticsCalls = (
   analytics: Analytics,
   buffer: PreInitMethodCallBuffer
 ): void => {
-  buffer.getCalls(name).forEach((c) => {
+  buffer.dequeue(name).forEach((c) => {
     // While the underlying methods are synchronous, the callAnalyticsMethod returns a promise,
     // which normalizes success and error states between async and non-async methods, with no perf penalty.
     callAnalyticsMethod(analytics, c).catch(console.error)
@@ -65,7 +65,7 @@ export const flushAddSourceMiddleware = async (
   analytics: Analytics,
   buffer: PreInitMethodCallBuffer
 ) => {
-  for (const c of buffer.getCalls('addSourceMiddleware')) {
+  for (const c of buffer.dequeue('addSourceMiddleware')) {
     await callAnalyticsMethod(analytics, c).catch(console.error)
   }
 }
@@ -94,9 +94,11 @@ export const flushAnalyticsCallsInNewTask = (
   buffer: PreInitMethodCallBuffer
 ): void => {
   buffer.toArray().forEach((m) => {
-    setTimeout(() => {
-      callAnalyticsMethod(analytics, m).catch(console.error)
-    }, 0)
+    buffer.dequeue(m.method).forEach((c) => {
+      setTimeout(() => {
+        callAnalyticsMethod(analytics, c).catch(console.error)
+      }, 0)
+    })
   })
 }
 

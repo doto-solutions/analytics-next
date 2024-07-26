@@ -18,6 +18,58 @@ describe(PreInitMethodCallBuffer, () => {
     GlobalAnalytics.setGlobalAnalytics(undefined as any)
   })
 
+  describe('dequeue', () => {
+    let buffer: PreInitMethodCallBuffer
+    let mockCalls: PreInitMethodCall[]
+    beforeEach(() => {
+      mockCalls = [
+        new PreInitMethodCall('track', ['arg1']),
+        new PreInitMethodCall('identify', ['arg2']),
+        new PreInitMethodCall('track', ['arg3']),
+        new PreInitMethodCall('group', ['arg4']),
+      ]
+      buffer = new PreInitMethodCallBuffer(...mockCalls)
+    })
+
+    test('dequeue should return the correct buffered method calls', () => {
+      const trackCalls = buffer.dequeue('track')
+      expect(trackCalls).toEqual([
+        expect.objectContaining<Partial<PreInitMethodCall>>({
+          method: 'track',
+          args: ['arg1', getBufferedPageCtxFixture()],
+        }),
+        expect.objectContaining<Partial<PreInitMethodCall>>({
+          method: 'track',
+          args: ['arg3', getBufferedPageCtxFixture()],
+        }),
+      ])
+      expect(buffer.getCalls('track')).toEqual([])
+
+      const identifyCalls = buffer.dequeue('identify')
+      expect(identifyCalls).toEqual([
+        expect.objectContaining({
+          method: 'identify',
+          args: ['arg2', getBufferedPageCtxFixture()],
+        }),
+      ])
+      expect(buffer.getCalls('identify')).toEqual([])
+      expect(buffer.getCalls('group').length).toBe(1)
+    })
+
+    test('dequeue should clear the buffered method calls after returning them', () => {
+      buffer.dequeue('track')
+      expect(buffer.getCalls('track')).toEqual([])
+
+      buffer.dequeue('identify')
+      expect(buffer.getCalls('identify')).toEqual([])
+    })
+
+    test('dequeue should return an empty array if there are no buffered method calls', () => {
+      const aliasCalls = buffer.dequeue('alias')
+      expect(aliasCalls).toEqual([])
+    })
+  })
+
   describe('toArray()', () => {
     it('should convert the map back to an array', () => {
       const call1 = new PreInitMethodCall('identify', [], jest.fn())
