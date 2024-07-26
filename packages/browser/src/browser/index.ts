@@ -25,7 +25,6 @@ import {
   flushSetAnonymousID,
   flushOn,
   PreInitMethodCall,
-  callAnalyticsMethod,
   flushRegister,
 } from '../core/buffer'
 import { ClassicIntegrationSource } from '../plugins/ajs-destination/types'
