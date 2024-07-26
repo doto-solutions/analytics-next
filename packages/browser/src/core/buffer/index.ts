@@ -70,6 +70,18 @@ export const flushAddSourceMiddleware = async (
   }
 }
 
+/**
+ *  Flush register plugin
+ */
+export const flushRegister = async (
+  analytics: Analytics,
+  buffer: PreInitMethodCallBuffer
+) => {
+  for (const c of buffer.dequeue('register')) {
+    await callAnalyticsMethod(analytics, c).catch(console.error)
+  }
+}
+
 export const flushOn = flushSyncAnalyticsCalls.bind(this, 'on')
 
 export const flushSetAnonymousID = flushSyncAnalyticsCalls.bind(
@@ -178,6 +190,9 @@ export class PreInitMethodCallBuffer {
     return (this.calls[methodName] ?? []) as PreInitMethodCall<T>[]
   }
 
+  /**
+   * Get all buffered method calls for a given method name, and clear them from the buffer.
+   */
   dequeue<T extends PreInitMethodName>(methodName: T): PreInitMethodCall<T>[] {
     const calls = this.getCalls(methodName)
     this.calls[methodName] = []

@@ -25,6 +25,8 @@ import {
   flushSetAnonymousID,
   flushOn,
   PreInitMethodCall,
+  callAnalyticsMethod,
+  flushRegister,
 } from '../core/buffer'
 import { ClassicIntegrationSource } from '../plugins/ajs-destination/types'
 import { attachInspector } from '../core/inspector'
@@ -307,13 +309,7 @@ async function registerPlugins(
     )
   }
 
-  const bufferedRegisterCalls = preInitBuffer.dequeue('register')
-  for (const b of bufferedRegisterCalls) {
-    await analytics
-      .register(...(b.args as Plugin[]))
-      .then((ctx) => b.resolve(Promise.resolve(ctx)))
-      .catch((err) => b.reject(err))
-  }
+  await flushRegister(analytics, preInitBuffer)
   const ctx = await analytics.register(...toRegister)
 
   if (
