@@ -96,7 +96,7 @@ export const flushAnalyticsCallsInNewTask = (
 ): void => {
   ;(Object.keys(buffer.calls) as (keyof typeof buffer.calls)[]).forEach((m) => {
     buffer.dequeue(m).forEach((c) => {
-      // I am not sure anyone alive knows why this setTimeout is/was necessary. Lost to history.
+      // I am not sure anyone alive knows why this event loop 'optimization' is actually neccessary. Lost to history.
       setTimeout(() => {
         callAnalyticsMethod(analytics, c).catch(console.error)
       }, 0)
