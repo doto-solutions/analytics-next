@@ -306,9 +306,9 @@ async function registerPlugins(
   // order is important here, (for example, if there are multiple enrichment plugins, the last one wins.)
   const ctx = await analytics.register(...basePlugins)
 
-  // register plugings passed into the settings object
+  // register plugins passed into the settings object (relevant to npm-only atm)
   await analytics.register(...pluginsFromSettings)
-  // register plugins from any buffered analytics.register() calls
+  // register plugins from any buffered analytics.register() calls -- these or registered last, so they take precedence
   await flushRegister(analytics, preInitBuffer)
 
   if (
