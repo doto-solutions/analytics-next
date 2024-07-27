@@ -222,7 +222,7 @@ async function registerPlugins(
   legacyIntegrationSources: ClassicIntegrationSource[],
   preInitBuffer: PreInitMethodCallBuffer
 ): Promise<Context> {
-  const plugins = pluginLikes?.filter(
+  const pluginsFromSettings = pluginLikes?.filter(
     (pluginLike) => typeof pluginLike === 'object'
   ) as Plugin[]
 
@@ -305,9 +305,10 @@ async function registerPlugins(
 
   // order is important here, (for example, if there are multiple enrichment plugins, the last one wins.)
   const ctx = await analytics.register(...basePlugins)
-  // register plugins passed into settings object
-  await analytics.register(...plugins)
-  // register plugins passed manually, via analytics.register()
+
+  // register plugings passed into the settings object
+  await analytics.register(...pluginsFromSettings)
+  // register plugins from any buffered analytics.register() calls
   await flushRegister(analytics, preInitBuffer)
 
   if (
