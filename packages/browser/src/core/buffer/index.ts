@@ -11,6 +11,7 @@ import {
   createPageContext,
   PageContext,
 } from '../page'
+import { type } from 'os'
 
 /**
  * The names of any AnalyticsBrowser methods that also exist on Analytics

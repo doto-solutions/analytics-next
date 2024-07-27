@@ -282,15 +282,10 @@ async function registerPlugins(
     pluginSources
   ).catch(() => [])
 
-  const toRegister = [
-    envEnrichment,
-    ...plugins,
-    ...legacyDestinations,
-    ...remotePlugins,
-  ]
+  const basePlugins = [envEnrichment, ...legacyDestinations, ...remotePlugins]
 
   if (schemaFilter) {
-    toRegister.push(schemaFilter)
+    basePlugins.push(schemaFilter)
   }
 
   const shouldIgnoreSegmentio =
@@ -299,7 +294,7 @@ async function registerPlugins(
     (options.integrations && options.integrations['Segment.io'] === false)
 
   if (!shouldIgnoreSegmentio) {
-    toRegister.push(
+    basePlugins.push(
       await segmentio(
         analytics,
         mergedSettings['Segment.io'] as SegmentioSettings,
@@ -308,8 +303,12 @@ async function registerPlugins(
     )
   }
 
+  // order is important here, (for example, if there are multiple enrichment plugins, the last one wins.)
+  const ctx = await analytics.register(...basePlugins)
+  // register plugins passed into settings object
+  await analytics.register(...plugins)
+  // register plugins passed manually, via analytics.register()
   await flushRegister(analytics, preInitBuffer)
-  const ctx = await analytics.register(...toRegister)
 
   if (
     Object.entries(cdnSettings.enabledMiddleware ?? {}).some(
