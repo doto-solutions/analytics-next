@@ -56,7 +56,10 @@ describe('Lazy initialization', () => {
 const createTestPluginFactory = (name: string, type: PluginType) => {
   const lock = createDeferred<void>()
   const load = createDeferred<void>()
-  const trackSpy = jest.fn().mockImplementation((ctx) => ctx)
+  const trackSpy = jest.fn().mockImplementation((ctx) => {
+    ctx.event.context!.ran = true
+    return ctx
+  })
 
   const factory: PluginFactory = () => {
     return {
@@ -203,6 +206,9 @@ describe('Lazy destination loading', () => {
 
       await nextTickP()
       expect(dest1Harness.trackSpy).toHaveBeenCalledTimes(1)
+      expect(dest1Harness.trackSpy.mock.calls[0][0].event.context.ran).toBe(
+        true
+      )
 
       // now we'll send another event
 
@@ -229,7 +235,6 @@ describe('Lazy destination loading', () => {
       expect(dest2Harness.trackSpy).toHaveBeenCalledTimes(2)
     })
   })
-
   it('emits initialize regardless of whether all destinations have loaded', async () => {
     const dest1Harness = createTestPluginFactory('braze', 'destination')
     const dest2Harness = createTestPluginFactory('google', 'destination')
