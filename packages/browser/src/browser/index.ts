@@ -209,8 +209,6 @@ async function flushFinalBuffer(
   // analytics calls during async function calls.
   await flushAddSourceMiddleware(analytics, buffer)
   flushAnalyticsCallsInNewTask(analytics, buffer)
-  // Clear buffer, just in case analytics is loaded twice; we don't want to fire events off again.
-  buffer.clear()
 }
 
 async function registerPlugins(
