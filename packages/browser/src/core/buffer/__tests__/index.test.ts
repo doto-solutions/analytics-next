@@ -18,7 +18,7 @@ describe(PreInitMethodCallBuffer, () => {
     GlobalAnalytics.setGlobalAnalytics(undefined as any)
   })
 
-  describe('dequeue', () => {
+  describe('getAndRemove()', () => {
     let buffer: PreInitMethodCallBuffer
     let mockCalls: PreInitMethodCall[]
     beforeEach(() => {
@@ -31,7 +31,7 @@ describe(PreInitMethodCallBuffer, () => {
       buffer = new PreInitMethodCallBuffer(...mockCalls)
     })
 
-    test('dequeue should return the correct buffered method calls', () => {
+    test('should return the correct buffered method calls', () => {
       const trackCalls = buffer.getAndRemove('track')
       expect(trackCalls).toEqual([
         expect.objectContaining<Partial<PreInitMethodCall>>({
@@ -56,7 +56,7 @@ describe(PreInitMethodCallBuffer, () => {
       expect(buffer.get('group').length).toBe(1)
     })
 
-    test('dequeue should clear the buffered method calls after returning them', () => {
+    test('should clear the buffered method calls after returning them', () => {
       buffer.getAndRemove('track')
       expect(buffer.get('track')).toEqual([])
 
@@ -64,7 +64,7 @@ describe(PreInitMethodCallBuffer, () => {
       expect(buffer.get('identify')).toEqual([])
     })
 
-    test('dequeue should return an empty array if there are no buffered method calls', () => {
+    test('should return an empty array if there are no buffered method calls', () => {
       const aliasCalls = buffer.getAndRemove('alias')
       expect(aliasCalls).toEqual([])
     })
