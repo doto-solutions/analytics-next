@@ -11,7 +11,6 @@ import {
   createPageContext,
   PageContext,
 } from '../page'
-import { type } from 'os'
 
 /**
  * The names of any AnalyticsBrowser methods that also exist on Analytics
@@ -55,7 +54,7 @@ const flushSyncAnalyticsCalls = (
   analytics: Analytics,
   buffer: PreInitMethodCallBuffer
 ): void => {
-  buffer.dequeue(name).forEach((c) => {
+  buffer.getAndRemove(name).forEach((c) => {
     // While the underlying methods are synchronous, the callAnalyticsMethod returns a promise,
     // which normalizes success and error states between async and non-async methods, with no perf penalty.
     callAnalyticsMethod(analytics, c).catch(console.error)
@@ -66,7 +65,7 @@ export const flushAddSourceMiddleware = async (
   analytics: Analytics,
   buffer: PreInitMethodCallBuffer
 ) => {
-  for (const c of buffer.dequeue('addSourceMiddleware')) {
+  for (const c of buffer.getAndRemove('addSourceMiddleware')) {
     await callAnalyticsMethod(analytics, c).catch(console.error)
   }
 }
@@ -78,7 +77,7 @@ export const flushRegister = async (
   analytics: Analytics,
   buffer: PreInitMethodCallBuffer
 ) => {
-  for (const c of buffer.dequeue('register')) {
+  for (const c of buffer.getAndRemove('register')) {
     await callAnalyticsMethod(analytics, c).catch(console.error)
   }
 }
@@ -95,7 +94,7 @@ export const flushAnalyticsCallsInNewTask = (
   buffer: PreInitMethodCallBuffer
 ): void => {
   ;(Object.keys(buffer.calls) as (keyof typeof buffer.calls)[]).forEach((m) => {
-    buffer.dequeue(m).forEach((c) => {
+    buffer.getAndRemove(m).forEach((c) => {
       // No one remembers why this event loop optimization is/was neccessary. Lost to history.
       setTimeout(() => {
         callAnalyticsMethod(analytics, c).catch(console.error)
@@ -190,15 +189,17 @@ export class PreInitMethodCallBuffer {
     this._callMap = calls
   }
 
-  getCalls<T extends PreInitMethodName>(methodName: T): PreInitMethodCall<T>[] {
+  get<T extends PreInitMethodName>(methodName: T): PreInitMethodCall<T>[] {
     return (this.calls[methodName] ?? []) as PreInitMethodCall<T>[]
   }
 
   /**
    * Get all buffered method calls for a given method name, and clear them from the buffer.
    */
-  dequeue<T extends PreInitMethodName>(methodName: T): PreInitMethodCall<T>[] {
-    const calls = this.getCalls(methodName)
+  getAndRemove<T extends PreInitMethodName>(
+    methodName: T
+  ): PreInitMethodCall<T>[] {
+    const calls = this.get(methodName)
     this.calls[methodName] = []
     return calls
   }

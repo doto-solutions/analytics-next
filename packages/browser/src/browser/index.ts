@@ -222,6 +222,7 @@ async function registerPlugins(
   legacyIntegrationSources: ClassicIntegrationSource[],
   preInitBuffer: PreInitMethodCallBuffer
 ): Promise<Context> {
+  flushPreBuffer(analytics, preInitBuffer)
   const pluginsFromSettings = pluginLikes?.filter(
     (pluginLike) => typeof pluginLike === 'object'
   ) as Plugin[]
@@ -395,9 +396,6 @@ async function loadAnalytics(
     host: segmentLoadOptions?.apiHost ?? cdnSettings.metrics?.host,
     protocol: segmentLoadOptions?.protocol,
   })
-
-  // needs to be flushed before plugins are registered
-  flushPreBuffer(analytics, preInitBuffer)
 
   const ctx = await registerPlugins(
     settings.writeKey,

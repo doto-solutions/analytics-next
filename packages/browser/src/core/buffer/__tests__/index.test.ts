@@ -32,7 +32,7 @@ describe(PreInitMethodCallBuffer, () => {
     })
 
     test('dequeue should return the correct buffered method calls', () => {
-      const trackCalls = buffer.dequeue('track')
+      const trackCalls = buffer.getAndRemove('track')
       expect(trackCalls).toEqual([
         expect.objectContaining<Partial<PreInitMethodCall>>({
           method: 'track',
@@ -43,29 +43,29 @@ describe(PreInitMethodCallBuffer, () => {
           args: ['arg3', getBufferedPageCtxFixture()],
         }),
       ])
-      expect(buffer.getCalls('track')).toEqual([])
+      expect(buffer.get('track')).toEqual([])
 
-      const identifyCalls = buffer.dequeue('identify')
+      const identifyCalls = buffer.getAndRemove('identify')
       expect(identifyCalls).toEqual([
         expect.objectContaining({
           method: 'identify',
           args: ['arg2', getBufferedPageCtxFixture()],
         }),
       ])
-      expect(buffer.getCalls('identify')).toEqual([])
-      expect(buffer.getCalls('group').length).toBe(1)
+      expect(buffer.get('identify')).toEqual([])
+      expect(buffer.get('group').length).toBe(1)
     })
 
     test('dequeue should clear the buffered method calls after returning them', () => {
-      buffer.dequeue('track')
-      expect(buffer.getCalls('track')).toEqual([])
+      buffer.getAndRemove('track')
+      expect(buffer.get('track')).toEqual([])
 
-      buffer.dequeue('identify')
-      expect(buffer.getCalls('identify')).toEqual([])
+      buffer.getAndRemove('identify')
+      expect(buffer.get('identify')).toEqual([])
     })
 
     test('dequeue should return an empty array if there are no buffered method calls', () => {
-      const aliasCalls = buffer.dequeue('alias')
+      const aliasCalls = buffer.getAndRemove('alias')
       expect(aliasCalls).toEqual([])
     })
   })
@@ -116,22 +116,22 @@ describe(PreInitMethodCallBuffer, () => {
     })
   })
 
-  describe('getCalls()', () => {
+  describe('get()', () => {
     it('should fetch calls by name', async () => {
       const buffer = new PreInitMethodCallBuffer()
       const call1 = new PreInitMethodCall('identify', [], jest.fn())
       const call2 = new PreInitMethodCall('identify', [], jest.fn())
       const call3 = new PreInitMethodCall('group', [], jest.fn())
       buffer.push(call1, call2, call3)
-      expect(buffer.getCalls('identify')).toEqual([call1, call2])
-      expect(buffer.getCalls('group')).toEqual([call3])
+      expect(buffer.get('identify')).toEqual([call1, call2])
+      expect(buffer.get('group')).toEqual([call3])
     })
     it('should read from Snippet Buffer', () => {
       const call1 = new PreInitMethodCall('identify', ['foo'], jest.fn())
       GlobalAnalytics.setGlobalAnalytics([['identify', 'snippet']] as any)
 
       const buffer = new PreInitMethodCallBuffer(call1)
-      const calls = buffer.getCalls('identify')
+      const calls = buffer.get('identify')
       expect(calls.length).toBe(2)
       expect(calls[0]).toEqual(
         expect.objectContaining<Partial<PreInitMethodCall>>({
@@ -180,7 +180,7 @@ describe(PreInitMethodCallBuffer, () => {
       const buffer = new PreInitMethodCallBuffer(
         new PreInitMethodCall(method, ['foo'], jest.fn())
       )
-      expect(buffer.getCalls(method)[0].args).toEqual([
+      expect(buffer.get(method)[0].args).toEqual([
         'foo',
         getBufferedPageCtxFixture(),
       ])
