@@ -352,7 +352,7 @@ async function loadAnalytics(
 
   if (options.initialPageview) {
     // capture the page context early, so it's always up-to-date
-    preInitBuffer.push(new PreInitMethodCall('page', []))
+    preInitBuffer.add(new PreInitMethodCall('page', []))
   }
 
   let cdnSettings =

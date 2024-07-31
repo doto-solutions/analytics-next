@@ -174,7 +174,7 @@ export class PreInitMethodCallBuffer {
   private _callMap: MethodCallMap = {}
 
   constructor(...calls: PreInitMethodCall[]) {
-    this.push(...calls)
+    this.add(...calls)
   }
 
   /**
@@ -204,7 +204,7 @@ export class PreInitMethodCallBuffer {
     return calls
   }
 
-  push(...calls: PreInitMethodCall[]): void {
+  add(...calls: PreInitMethodCall[]): void {
     calls.forEach((call) => {
       const eventsExpectingPageContext: PreInitMethodName[] = [
         'track',
@@ -252,7 +252,7 @@ export class PreInitMethodCallBuffer {
     const calls = buffered.map(
       ([methodName, ...args]) => new PreInitMethodCall(methodName, args)
     )
-    this.push(...calls)
+    this.add(...calls)
   }
 }
 
@@ -371,7 +371,7 @@ export class AnalyticsBuffered
         return Promise.resolve(result)
       }
       return new Promise((resolve, reject) => {
-        this._preInitBuffer.push(
+        this._preInitBuffer.add(
           new PreInitMethodCall(methodName, args, resolve as any, reject)
         )
       })
@@ -388,7 +388,7 @@ export class AnalyticsBuffered
         void (this.instance[methodName] as Function)(...args)
         return this
       } else {
-        this._preInitBuffer.push(new PreInitMethodCall(methodName, args))
+        this._preInitBuffer.add(new PreInitMethodCall(methodName, args))
       }
 
       return this

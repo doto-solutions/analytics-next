@@ -96,11 +96,11 @@ describe(PreInitMethodCallBuffer, () => {
     })
   })
 
-  describe('push()', () => {
+  describe('add()', () => {
     it('should add method calls', () => {
       const call1 = new PreInitMethodCall('identify', [], jest.fn())
       const buffer = new PreInitMethodCallBuffer()
-      buffer.push(call1)
+      buffer.add(call1)
       expect(buffer.toArray()).toEqual([call1])
     })
 
@@ -110,8 +110,8 @@ describe(PreInitMethodCallBuffer, () => {
       const call3 = new PreInitMethodCall('group', [], jest.fn())
       const call4 = new PreInitMethodCall('group', [], jest.fn())
       const buffer = new PreInitMethodCallBuffer(call1)
-      buffer.push(call2, call3)
-      buffer.push(call4)
+      buffer.add(call2, call3)
+      buffer.add(call4)
       expect(buffer.toArray()).toEqual([call1, call2, call3, call4])
     })
   })
@@ -122,7 +122,7 @@ describe(PreInitMethodCallBuffer, () => {
       const call1 = new PreInitMethodCall('identify', [], jest.fn())
       const call2 = new PreInitMethodCall('identify', [], jest.fn())
       const call3 = new PreInitMethodCall('group', [], jest.fn())
-      buffer.push(call1, call2, call3)
+      buffer.add(call1, call2, call3)
       expect(buffer.get('identify')).toEqual([call1, call2])
       expect(buffer.get('group')).toEqual([call3])
     })
