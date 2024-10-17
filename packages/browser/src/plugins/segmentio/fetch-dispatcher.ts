@@ -5,15 +5,17 @@ export type Dispatcher = (url: string, body: object) => Promise<unknown>
 
 export type StandardDispatcherConfig = {
   keepalive?: boolean
+  customHeaders?: { [any: string]: string }
 }
 
 export default function (config?: StandardDispatcherConfig): {
   dispatch: Dispatcher
 } {
+  const customHeaders = config?.customHeaders ?? {}
   function dispatch(url: string, body: object): Promise<unknown> {
     return fetch(url, {
       keepalive: config?.keepalive,
-      headers: { 'Content-Type': 'text/plain' },
+      headers: { 'Content-Type': 'text/plain', ...customHeaders },
       method: 'post',
       body: JSON.stringify(body),
     }).then((res) => {

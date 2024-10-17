@@ -10,6 +10,7 @@ export type BatchingDispatchConfig = {
   timeout?: number
   maxRetries?: number
   keepalive?: boolean
+  customHeaders?: { [any: string]: string }
 }
 
 const MAX_PAYLOAD_SIZE = 500
@@ -67,6 +68,8 @@ export default function batch(
 
   const limit = config?.size ?? 10
   const timeout = config?.timeout ?? 5000
+  const customHeaders = config?.customHeaders ?? {}
+
   let rateLimitTimeout = 0
 
   function sendBatch(batch: object[]) {
@@ -86,6 +89,7 @@ export default function batch(
       keepalive: config?.keepalive || pageUnloaded,
       headers: {
         'Content-Type': 'text/plain',
+        ...customHeaders
       },
       method: 'post',
       body: JSON.stringify({
